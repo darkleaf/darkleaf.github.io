@@ -40,3 +40,82 @@ https://github.com/metosin/jsonista#tagged-json
 сделать insert из json `[{name: "xyz"}, {...}]`.
 
 придумать как сделать вложенный инсерт `[{coll: [{...}, ...]}, ...]`. Видимо на CTE и join.
+
+```sql
+create table posts (
+  id serial primary key,
+  title varchar(256),
+  content text
+);
+
+create table comments (
+  id serial primary key,
+  post_id integer,
+  content text
+);
+
+
+insert into posts
+select
+  nextval('posts_id_seq') as id,
+  title,
+  content
+from json_populate_recordset(
+  null::posts,
+  '[{"title":"a", "content":"xyz"},
+    {"title":"b", "content":"zyx"}]'::json
+)
+returning id;
+
+select * from posts;
+select * from comments;
+```
+
+```sql
+with data as (
+  select * from json_array_elements(
+ '[{
+    "title":"a",
+    "content":"xyz",
+    "comments":[{"content":"123"}, {"content":"asd"}]
+   },
+   {
+    "title":"b",
+    "content":"zyx",
+    "comments":[{"content":"987"}]
+   }]'::json
+  )
+),
+posts as (
+  select
+    nextval('posts_id_seq') as id,
+    title,
+    content,
+    value->'comments' as comments
+  from data, json_populate_record(null::posts, value)
+),
+insert_posts as (
+  insert into posts
+  select id, title, content
+  from posts
+  returning id
+),
+comments as (
+  select
+    nextval('comments_id_seq') as id,
+    posts.id as posts_id,
+    comments.content
+  from posts,
+       json_populate_recordset(null::comments, comments) as comments
+),
+insert_comments as (
+  insert into comments
+  select *
+  from comments
+  returning id
+)
+select 1;
+
+select * from posts;
+select * from comments;
+```
