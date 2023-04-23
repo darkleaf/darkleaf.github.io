@@ -119,3 +119,19 @@ select 1;
 select * from posts;
 select * from comments;
 ```
+
+
+
+Типы все равно нужно будет вручную приводить.
+И придется 3 раза перечислять поля.
+
+```sql
+insert into posts (title, content, published_at)
+select
+  title,
+  content,
+  instant(published_at) as published_at
+from json_to_record($1) as (title text, content text, published_at json)
+```
+
+`published_at = ["$instant", "2023-...."]::json`
