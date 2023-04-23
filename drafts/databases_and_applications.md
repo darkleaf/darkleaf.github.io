@@ -122,6 +122,57 @@ select * from comments;
 
 
 
+~~Не придется~~: CREATE CAST
+
+```sql
+create function instant (json) returns timestamptz
+as 'select now();'
+language sql;
+
+CREATE CAST (json AS timestamptz)
+    WITH FUNCTION instant;
+
+-- работает
+select instant('null'::json);
+
+-- работает
+select 'null'::json::timestamptz;
+
+-- не работает
+select *
+from json_to_recordset(
+  '[{"now":["$instant", "2023"]}]'::json
+) as (now timestamptz)
+--  error: invalid input syntax for type timestamp with time zone: "["$instant", "2023"]"
+-- даже если создать преобразование text->timestamptz
+
+```
+
+
+```sql
+create function instant (json) returns timestamptz
+as 'select now();'
+language sql;
+
+CREATE CAST (json AS timestamptz)
+    WITH FUNCTION instant AS IMPLICIT;
+
+insert into test
+select *
+from json_to_recordset(
+  '[{"now":["$instant", "2023-04-23"]}]'::json
+) as (now json);
+```
+работает через `json_to_recordset`, когда из json вычитываем json и он через implicit преобразование
+преобразуется в timestamptz. Если делать `as (now timestamptz)` то тоже не работает.
+
+
+
+https://postgrest.org/en/v8.0/how-tos/casting-type-to-custom-json.html
+из типа в json должно работать
+
+
+
 Типы все равно нужно будет вручную приводить.
 И придется 3 раза перечислять поля.
 
