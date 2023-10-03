@@ -18,7 +18,10 @@
 Или я могу взять `java.nio.ByteBuffer` из стандартной библиотеки Java и написать функцию
 для формирования компактного ключа Redis в виде массива байт, маленькими шагами и постоянно проверяя результат.
 
-<video  src="repl.webm" height="300" muted autoplay loop></video>
+<video  height="300" muted autoplay loop>
+   <source src="repl.webm" type="video/webm" />
+   <source src="repl.mp4" type="video/mp4" />
+</video>
 
 Clojure, как и многие другие языки, имеет REPL. Даже Java теперь имеет REPL.
 REPL - это аббревиатура от "Прочитать, Исполнить, Распечатать, Повторить".
