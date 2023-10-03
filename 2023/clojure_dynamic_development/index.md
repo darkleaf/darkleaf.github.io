@@ -18,7 +18,7 @@
 Или я могу взять `java.nio.ByteBuffer` из стандартной библиотеки Java и написать функцию
 для формирования компактного ключа Redis в виде массива байт, маленькими шагами и постоянно проверяя результат.
 
-<video  height="300" muted autoplay loop>
+<video  height="300" controls muted autoplay loop>
    <source src="repl.webm" type="video/webm" />
    <source src="repl.mp4" type="video/mp4" />
 </video>
